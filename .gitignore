@@ -30,3 +30,30 @@
 
 # Debug files
 *.dSYM/
+
+# Exclude linker/assembler files
+*.map
+*.lst
+*.sym
+*.dep
+
+# Exclude archive files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Exclude VIM session files
+*.vim
+
+# Misc files to be excluded as well
+.DS_Store
+*.swp
+*.bak
+*~
+
+# Exclude executable file
+cpuid/cpuid32
+cpuid/cpuid64
+
