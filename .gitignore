@@ -56,4 +56,6 @@
 # Exclude executable file
 cpuid/cpuid32
 cpuid/cpuid64
+asmtime/asmtime1
+asmtime/asmtime2
 
