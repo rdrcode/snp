@@ -1,5 +1,5 @@
 ;----------------------------------------------------------------------------
-;  asmtime2.asm - get time of day using gettimeofday system call
+;  asmtime64.asm - get time of day using gettimeofday system call
 ;----------------------------------------------------------------------------
 ;
 ; DHBW Ravensburg - Campus Friedrichshafen
@@ -24,6 +24,8 @@
 %define SECS_PER_MIN         60 ; seconds per minute
 %define SECS_PER_HOUR        60 * SECS_PER_MIN
 %define SECS_PER_DAY         24 * SECS_PER_HOUR
+%define DAYS_PER_WEEK         7 ; number of days per week
+%define EPOCH_WDAY            4 ; Epoch week day was a Thursday
 
 
 ;-----------------------------------------------------------------------------
@@ -35,14 +37,30 @@ SECTION .data
 
 
 ;-----------------------------------------------------------------------------
+; Section RODATA
+;-----------------------------------------------------------------------------
+SECTION .rodata
+
+; empty
+
+
+;-----------------------------------------------------------------------------
 ; Section BSS
 ;-----------------------------------------------------------------------------
 SECTION .bss
 
-timeval         resq 2
+; timeval structure
+timeval:
+tv_sec          resq 1
+tv_usec         resq 1
 
-secs_epoch      resd 1
 secs_today      resd 1
+days_epoch      resd 1
+
+; weekday (0 = Sunday, 1 = Monday, etc)
+wday            resb 1
+
+hms:
 hours           resb 1
 minutes         resb 1
 seconds         resb 1
@@ -64,7 +82,7 @@ _start:
         ; The first parameter is a pointer to a timeval structure.
         ;-----------------------------------------------------------
         SYSCALL_3 SYS_GETTIMEOFDAY, timeval, 0
-        mov     rax, [timeval]
+        mov     rax, [tv_sec]
 
         ;-----------------------------------------------------------
         ; convert ticks into hours, minutes and seconds of today
