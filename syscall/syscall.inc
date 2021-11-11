@@ -74,6 +74,7 @@
     %define SYS_GETPID           39
     %define SYS_GETTIMEOFDAY     96
     %define SYS_GETPPID         110
+    %define SYS_TIME            201
 
 
     %macro SYSCALL_1 1
