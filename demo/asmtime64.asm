@@ -44,13 +44,13 @@ ticks_str:  db "__________"
             db CHR_LF
 out_str_len equ $-out_str
 
-
 ;-----------------------------------------------------------------------------
 ; Section RODATA
 ;-----------------------------------------------------------------------------
 SECTION .rodata
-              ; 0   1   2   3   4   5   6
-wday_str    db "Thu Fri Sat Sun Mon Tue Wed "
+
+               ; 0   1   2   3   4   5   6
+wday_str:   db "Thu Fri Sat Sun Mon Tue Wed "
 
 ;-----------------------------------------------------------------------------
 ; Section BSS
@@ -82,8 +82,15 @@ SECTION .text
         ;-----------------------------------------------------------
         ; PROGRAM'S START ENTRY
         ;-----------------------------------------------------------
+%ifidn __OUTPUT_FORMAT__, macho64
+        DEFAULT REL
+        global start            ; make label available to linker
+start:                         ; standard entry point for ld
+%else
+        DEFAULT ABS
         global _start:function  ; make label available to linker
 _start:
+%endif
         ;-----------------------------------------------------------
         ; the system call returns the number of seconds since the Unix
         ; Epoch (01.01.1970 00:00:00 UTC).
@@ -113,7 +120,8 @@ _start:
         ; eax: #weeks
         ; edx: day of week
         mov     [wday],dl
-        mov     eax,[wday_str+edx*4]
+        lea     rsi,[wday_str]
+        mov     eax,[rsi+rdx*4]
         mov     [out_str],eax
 
         ;-----------------------------------------------------------
@@ -176,7 +184,7 @@ _start:
         mov     word [ss_str],ax
 
         ; uint_to_ascii(char *s, uint64_t ticks)
-        mov     rdi,ticks_str
+        lea     rdi,[ticks_str]
         mov     rsi,[tv_sec]
         call    uint_to_ascii
 

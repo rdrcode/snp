@@ -53,8 +53,15 @@ SECTION .text
         ;-----------------------------------------------------------
         ; PROGRAM'S START ENTRY
         ;-----------------------------------------------------------
+%ifidn __OUTPUT_FORMAT__, macho64
+        DEFAULT REL
+        global start            ; make label available to linker
+start:                         ; standard entry point for ld
+%else
+        DEFAULT ABS
         global _start:function  ; make label available to linker
-_start:                         ; standard entry point for ld
+_start:
+%endif
         ;-------------------------------------------------------------------
         ; Using CPUID standard function 0 in order to load a 12-character
         ; string into the EBX, EDX, and ECX registers identifying the

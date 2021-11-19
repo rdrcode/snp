@@ -105,8 +105,9 @@
 
 %elifidn __OUTPUT_FORMAT__, macho64
 
-    %define SYS_EXIT      0x2000001 ; exit system call
-    %define SYS_WRITE     0x2000004 ; write system call
+    %define SYS_EXIT           0x2000001
+    %define SYS_WRITE          0x2000004
+    %define SYS_GETTIMEOFDAY   0x2000074
 
     %macro SYSCALL_1 1
         mov      rax,%1

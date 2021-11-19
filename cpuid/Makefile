@@ -17,21 +17,40 @@ LD          = ld
 NASM        = nasm
 NASMOPT32   = -g -f elf -F dwarf
 NASMOPT64   = -g -f elf64 -F dwarf
-CFLAGS      = -Wall -g -std=gnu99 -O2
+LDOPT32     = -melf_i386
+LDOPT64     =
+CFLAGS      = -Wall -g -std=gnu99 -Og
 INCDIR      = ../syscall/
 
+OS          := $(shell uname -s)
+ARCH        := $(shell uname -m)
+
 TARGETS     = cpuid32 cpuid64
+
+# Cross-compile for x86_64 target on Apple M1
+ifeq ($(OS)_$(ARCH), Darwin_arm64)
+NASMOPT64   = -g -f macho64
+LDOPT64     = -macos_version_min 10.15 -arch x86_64 -static
+TARGETS     = cpuid64
+endif
 
 .PHONY: all
 all: $(TARGETS)
 
-cpuid32 : cpuid32.asm $(INCDIR)/syscall.inc
-	$(NASM) $(NASMOPT32) -I$(INCDIR) -l cpuid32.lst -o cpuid32.o $<
-	$(LD) -melf_i386 -o $@ cpuid32.o
+cpuid32.o : $(INCDIR)/syscall.inc
+cpuid64.o : $(INCDIR)/syscall.inc
 
-cpuid64 : cpuid64.asm $(INCDIR)/syscall.inc
-	$(NASM) $(NASMOPT64) -I$(INCDIR) -l cpuid64.lst -o cpuid64.o $<
-	$(LD) -o $@ cpuid64.o
+%32.o : %32.asm
+	$(NASM) $(NASMOPT32) -I$(INCDIR) -l $(basename $<).lst -o $@ $<
+
+%64.o : %64.asm
+	$(NASM) $(NASMOPT64) -I$(INCDIR) -l $(basename $<).lst -o $@ $<
+
+%32 : %32.o
+	$(LD) $(LDOPT32) -o $@ $<
+
+%64 : %64.o
+	$(LD) $(LDOPT64) -o $@ $<
 
 .PHONY: clean
 clean:

@@ -74,15 +74,22 @@ SECTION .text
         ;-----------------------------------------------------------
         ; PROGRAM'S START ENTRY
         ;-----------------------------------------------------------
+%ifidn __OUTPUT_FORMAT__, macho64
+        DEFAULT REL
+        global start            ; make label available to linker
+start:                         ; standard entry point for ld
+%else
+        DEFAULT ABS
         global _start:function  ; make label available to linker
 _start:
+%endif
         ;-----------------------------------------------------------
         ; the system call returns the number of seconds since the Unix
         ; Epoch (01.01.1970 00:00:00 UTC).
         ; The first parameter is a pointer to a timeval structure.
         ;-----------------------------------------------------------
         SYSCALL_3 SYS_GETTIMEOFDAY, timeval, 0
-        mov     rax, [tv_sec]
+        mov     rax, [rel tv_sec]
 
         ;-----------------------------------------------------------
         ; convert ticks into hours, minutes and seconds of today
@@ -99,7 +106,7 @@ _start:
         ; Note: since the number of seconds elapsed today easily fits
         ; into 32-bit we continue with 32-bit integer arithmetic.
         ;-----------------------------------------------------------
-        mov     [secs_today],edx
+        mov     [rel secs_today],edx
 
         ;-----------------------------------------------------------
         ; calculate the number of hours
@@ -113,7 +120,7 @@ _start:
         ; - eax contains the number of hours elapsed today
         ; - edx contains the number of seconds of the current hour
         ;-----------------------------------------------------------
-        mov     [hours],al
+        mov     [rel hours],al
 
         ;-----------------------------------------------------------
         ; calculate the number of minutes
@@ -127,8 +134,8 @@ _start:
         ; - eax contains the number of minutes of the current hour
         ; - edx contains the number of seconds of the current minute
         ;-----------------------------------------------------------
-        mov     [minutes],al
-        mov     [seconds],dl
+        mov     [rel minutes],al
+        mov     [rel seconds],dl
 
         ;-----------------------------------------------------------
         ; create label before program exit for our gdb script
