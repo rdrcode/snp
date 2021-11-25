@@ -83,29 +83,30 @@
     %endmacro
 
     %macro SYSCALL_2 2
-        mov      rax,%1
         mov      rdi,%2
+        mov      rax,%1
         syscall
     %endmacro
 
     %macro SYSCALL_3 3
-        mov      rax,%1
-        mov      rdi,%2
         mov      rsi,%3
+        mov      rdi,%2
+        mov      rax,%1
         syscall
     %endmacro
 
     %macro SYSCALL_4 4
-        mov      rax,%1
-        mov      rdi,%2
-        mov      rsi,%3
         mov      rdx,%4
+        mov      rsi,%3
+        mov      rdi,%2
+        mov      rax,%1
         syscall
     %endmacro
 
 %elifidn __OUTPUT_FORMAT__, macho64
 
     %define SYS_EXIT           0x2000001
+    %define SYS_READ           0x2000003
     %define SYS_WRITE          0x2000004
     %define SYS_GETTIMEOFDAY   0x2000074
 
@@ -115,23 +116,23 @@
     %endmacro
 
     %macro SYSCALL_2 2
+        mov      rdi,%2
         mov      rax,%1
-        mov      rdi,%1
         syscall
     %endmacro
 
     %macro SYSCALL_3 3
-        mov      rax,%1
-        mov      rdi,%2
         mov      rsi,%3
+        mov      rdi,%2
+        mov      rax,%1
         syscall
     %endmacro
 
     %macro SYSCALL_4 4
-        mov      rax,%1
-        mov      rdi,%2
-        mov      rsi,%3
         mov      rdx,%4
+        mov      rsi,%3
+        mov      rdi,%2
+        mov      rax,%1
         syscall
     %endmacro
 
