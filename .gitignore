@@ -59,4 +59,11 @@ cpuid/cpuid64
 asmtime/asmtime32
 asmtime/asmtime64
 asmtime/labor_tit13/asmtime1
+demo/asmtime64
+toupper/toupper32
+toupper/toupper64
+toupper/strtoupper?
+lettercount/lettercount64
+lettercount/genchartable
+lettercount/asciitable.inc
 
