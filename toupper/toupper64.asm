@@ -50,8 +50,15 @@ SECTION .text
         ;-----------------------------------------------------------
         ; PROGRAM'S START ENTRY
         ;-----------------------------------------------------------
+%ifidn __OUTPUT_FORMAT__, macho64
+        DEFAULT REL
+        global start            ; make label available to linker
+start:                         ; standard entry point for ld
+%else
+        DEFAULT ABS
         global _start:function  ; make label available to linker
 _start:
+%endif
         nop
 
 next_string:
@@ -62,7 +69,29 @@ next_string:
         test    rax,rax         ; check system call return value
         jz      _exit           ; jump to loop exit if end of input is
                                 ; reached, i.e. no characters have been
-                                ; read (eax == 0)
+                                ; read (rax == 0)
+        lea     rdi,[buffer]
+        mov     byte [rdi+rax],0    ; zero terminate string
+
+        ;-----------------------------------------------------------
+        ; convert all lower case characters in the string
+        ; to upper case, others remain unchanged
+        ;
+        ; Note: rax contains the number of characters in the string,
+        ;       returned by the read system call above
+        ;-----------------------------------------------------------
+        lea     rsi,[buffer]    ; load pointer to character buffer
+next_char:
+        movzx   edx,byte [rsi]  ; load next character from buffer
+        lea     r8d, [rdx-'a']
+        cmp     r8b, ('z'-'a')  ; check whether character is lower case
+        ja      not_lower_case  ;   no, then skip conversion
+        sub     dl,'a'-'A'      ; otherwise, convert to upper case and
+        mov     [rsi],dl        ; store converted character back to buffer
+not_lower_case:
+        inc     rsi             ; increment buffer pointer
+        test    dl,dl           ; check for end-of-string
+        jnz     next_char       ;   no, process next char in buffer
 
         ;-----------------------------------------------------------
         ; print modified string stored in buffer
