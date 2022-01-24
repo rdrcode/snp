@@ -66,4 +66,4 @@ toupper/strtoupper?
 lettercount/lettercount64
 lettercount/genchartable
 lettercount/asciitable.inc
-
+asciitoint/asciitoint
